@@ -1,9 +1,6 @@
-package codeEvent;
+package com.piar.entity;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.MessageEvent;
-
-import java.util.concurrent.Future;
 
 /**
  * Created by jnkmhbl on 17/3/8.

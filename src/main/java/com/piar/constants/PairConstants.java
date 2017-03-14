@@ -1,3 +1,5 @@
+package com.piar.constants;
+
 /**
  * Created by jnkmhbl on 17/3/8.
  */

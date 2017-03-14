@@ -1,7 +1,9 @@
+package com.piar.factory;
+
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.Channels;
-import pipeline.FrameDecoder;
-import pipeline.FrameEncoder;
+import com.piar.core.pipeline.FrameDecoder;
+import com.piar.core.pipeline.FrameEncoder;
 
 /**
  * Created by jnkmhbl on 17/3/6.

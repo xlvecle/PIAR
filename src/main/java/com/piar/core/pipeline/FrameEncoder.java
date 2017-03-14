@@ -1,10 +1,8 @@
-package pipeline;
+package com.piar.core.pipeline;
 
-import codeEvent.CodeEvent;
-import org.jboss.netty.buffer.ChannelBuffer;
+import com.piar.entity.CodeEvent;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 
 /**

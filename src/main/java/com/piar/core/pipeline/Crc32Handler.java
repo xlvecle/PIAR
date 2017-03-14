@@ -1,6 +1,6 @@
-package pipeline;
+package com.piar.core.pipeline;
 
-import codeEvent.CodeEvent;
+import com.piar.entity.CodeEvent;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.DynamicChannelBuffer;
 import org.jboss.netty.channel.*;

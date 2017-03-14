@@ -44,7 +44,7 @@ public class Crc32Handler extends SimpleChannelHandler{
         ChannelBuffer frame = codeEvent.getBuffer();
         int checkSum = (int)doChecksum0(frame,frame.readableBytes());
         if(frame instanceof DynamicChannelBuffer){
-            ChannelBuffer buffer = ((DynamicChannelBuffer)frame).factory().getBuffer(frame.readableBytes() + 4);
+            ChannelBuffer buffer = frame.factory().getBuffer(frame.readableBytes() + 4);
             buffer.writeInt(checkSum);
             frame = buffer ;
             Channels.write(ctx,msgEvent.getFuture(),((MessageEvent) e).getRemoteAddress());

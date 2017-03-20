@@ -1,6 +1,7 @@
 package com.piar.provider;
 
-import util.MethodKeyHelper;
+
+import com.piar.util.MethodKeyHelper;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class ThreadPoolProcessor {
                     Class serviceInterface =  provider.getServiceInterface();
                     Method [] methods = serviceInterface.getMethods();
                     for(Method method : methods){
-                        String methodKey = MethodKeyHelper.generateKey(serviceInterface,method.getName(),method.getParameterTypes());
+                        String methodKey = MethodKeyHelper.generateKey(serviceInterface, method.getName(), method.getParameterTypes());
                         methodCache.put(methodKey,method);
                     }
                 }

@@ -1,6 +1,7 @@
 
 package com.piar.test
 
+import com.piar.protocol.SimpleProtocol
 import com.piar.protocol.SimpleProtocolDecoder
 import java.util.UUID
 import io.netty.channel.socket.nio.NioSocketChannel
@@ -38,7 +39,7 @@ fun main(args: Array<String>) {
                 })
         val channelFuture = bootstrap.connect("localhost", 9999).sync()
 
-        channelFuture.channel().writeAndFlush(CustomProtocol(1024L, UUID.randomUUID().toString(), "content detail"))
+        channelFuture.channel().writeAndFlush(SimpleProtocol(1024L, UUID.randomUUID().toString(), "content detail"))
 
         channelFuture.channel().closeFuture().sync()
     } catch (e: Exception) {

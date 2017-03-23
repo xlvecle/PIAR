@@ -5,7 +5,7 @@ import java.lang.reflect.Proxy
 /**
  * Created by xingke on 2017/3/21.
  */
-class RpcInvokeProxyFactory {
+class CustomerRpcInvokeProxyFactory {
 
     companion object {
         @JvmStatic

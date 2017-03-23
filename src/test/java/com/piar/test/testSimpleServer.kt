@@ -17,7 +17,7 @@ import io.netty.handler.codec.ByteToMessageDecoder
  * Created by xingke on 2017/3/22.
  */
 
-fun main(args: Array<String>) {
+fun startNettyServer() {
     val serverBootstrap = ServerBootstrap()
     val eventLoopGroup = NioEventLoopGroup()
     val childEventLoopGroup = NioEventLoopGroup()
@@ -27,7 +27,6 @@ fun main(args: Array<String>) {
                 .group(eventLoopGroup, childEventLoopGroup)
                 .channel(NioServerSocketChannel::class.java)
                 .childHandler(object : ChannelInitializer<Channel>() {
-                    @Throws(Exception::class)
                     override protected fun initChannel(ch: Channel) {
                         ch.pipeline().addLast(SimpleProtocolDecoder()) // 解码器
                         ch.pipeline().addLast(ServerHandler()) // 打印数据
@@ -48,4 +47,8 @@ fun main(args: Array<String>) {
         }
 
     }
+}
+
+fun main(args: Array<String>) {
+    startNettyServer()
 }

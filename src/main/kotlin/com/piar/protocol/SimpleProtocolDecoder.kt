@@ -23,7 +23,6 @@ class SimpleProtocolDecoder: ByteToMessageDecoder() {
 
             out.add(SimpleProtocol(version, header, String(contentBytes)))
         } catch (e: Exception) {
-
         }
 
     }

@@ -10,7 +10,9 @@ import io.netty.bootstrap.Bootstrap
 import io.netty.buffer.ByteBuf
 import io.netty.channel.*
 import io.netty.channel.nio.NioEventLoopGroup
+import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.util.CharsetUtil
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -23,13 +25,28 @@ fun main(args: Array<String>) {
     val eventLoopGroup = NioEventLoopGroup()
 
     try {
+        bootstrap.option(ChannelOption.WRITE_BUFFER_HIGH_WATER_MARK,10 * 64 * 1024)
+
+//        bootstrap.option("sendBufferSize", 1048576)
+//        bootstrap.option(ChannelOption.SO_REUSEADDR)
+        bootstrap.option(ChannelOption.TCP_NODELAY, true)
+
+//        bootstrap.setOption("receiveBufferSize", 1048576);
+//
+//        bootstrap.setOption("tcpNoDelay", true);
         bootstrap
                 .group(eventLoopGroup)
                 .channel(NioSocketChannel::class.java)
                 .handler(object : ChannelInitializer<Channel>() {
                     @Throws(Exception::class)
                     override fun initChannel(ch: Channel) {
-                        ch.pipeline().addLast(SimpleProtocolDecoder()) // 编码器
+                        ch.pipeline().addLast(object : MessageToByteEncoder<SimpleProtocol>() {
+                            override fun encode(ctx: ChannelHandlerContext?, msg: SimpleProtocol, out: ByteBuf) {
+                                out.writeLong(msg.version)
+                                out.writeBytes(msg.header.toByteArray())
+                                out.writeBytes(msg.content.toByteArray())
+                            }
+                        }) // 编码器
                         ch.pipeline().addLast(object : SimpleChannelInboundHandler<ByteBuf>() {
                             override fun channelRead0(ctx: ChannelHandlerContext?, msg: ByteBuf) {
                                 System.out.println("send success, response is: " + msg.toString(CharsetUtil.UTF_8))
@@ -37,16 +54,16 @@ fun main(args: Array<String>) {
                         }) // 接收服务端数据
                     }
                 })
-        val channelFuture = bootstrap.connect("localhost", 9999).sync()
+        val channelFuture = bootstrap.connect("localhost", 9999).sync().channel()
 
-        channelFuture.channel().writeAndFlush(SimpleProtocol(1024L, UUID.randomUUID().toString(), "content detail"))
+        channelFuture.writeAndFlush(SimpleProtocol(1024L, UUID.randomUUID().toString(), "KK"))
 
-        channelFuture.channel().closeFuture().sync()
+        channelFuture.closeFuture().sync()
     } catch (e: Exception) {
         e.printStackTrace()
     } finally {
         try {
-            eventLoopGroup.shutdownGracefully().sync()
+            eventLoopGroup.shutdownGracefully(1, 1, TimeUnit.MILLISECONDS).sync()
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }

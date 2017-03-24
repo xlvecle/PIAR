@@ -5,6 +5,6 @@ package com.piar.demo;
  */
 public interface TestLocalService {
 
-    Integer add(Integer a, Integer b, Integer c);
+    Student getAStudent(String name);
 
 }

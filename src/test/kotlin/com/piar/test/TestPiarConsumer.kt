@@ -11,7 +11,7 @@ fun testRpcProxy() {
     var context = ClassPathXmlApplicationContext("classpath:test-consumer.xml")
     context.start()
     var testLocalService = context.getBean("testService") as TestLocalService
-    testLocalService.add(1, 2, 3)
+    val student = testLocalService.getAStudent("小明")
 }
 
 

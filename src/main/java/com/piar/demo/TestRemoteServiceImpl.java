@@ -6,7 +6,10 @@ package com.piar.demo;
 public class TestRemoteServiceImpl implements TestLocalService {
 
     @Override
-    public Integer add(Integer a, Integer b, Integer c) {
-        return a + b + c;
+    public Student getAStudent(String name) {
+        Student student = new Student();
+        student.setName(name);
+        student.setAge((int)(Math.random()*100));
+        return student;
     }
 }

@@ -1,5 +1,6 @@
 package com.piar.protocol
 
+import java.io.ObjectOutput
 import java.io.Serializable
 
 /**
@@ -7,7 +8,10 @@ import java.io.Serializable
  */
 data class RpcInvokation(val service: String, val methodName: String, val parameterTypes: Array<Class<*>>, val args: Array<Object>): Serializable {
 
-    lateinit var result: Object
+    var result: Any? = null
+    constructor(result: Any): this("", "", arrayOf(1.javaClass), arrayOf(1 as Object)) {
+        this.result = result
+    }
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other)

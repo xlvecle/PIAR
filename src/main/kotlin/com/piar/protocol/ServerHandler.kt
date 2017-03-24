@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.TypeReference
 import com.piar.server.deserializedString
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.EmptyByteBuf
 import io.netty.channel.ChannelFutureListener
 import io.netty.util.CharsetUtil
 import io.netty.buffer.Unpooled
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component
 import org.springframework.context.ApplicationContext
 import org.springframework.util.SerializationUtils
 import java.io.ObjectInputStream
+import java.nio.ByteBuffer
+import java.util.*
 
 
 /**
@@ -42,12 +45,12 @@ class ServerHandler : SimpleChannelInboundHandler<SimpleProtocol>() {
 
         var invoke = method.invoke(bean, *args)
         println("服务为: $serviceName")
-
-        msg.rpcInvokation!!.result = invoke as java.lang.Object
-
+        println("执行结果为: $invoke")
 
 //        ctx.channel().write(msg)
 //        ctx.writeAndFlush(invoke).addListener(ChannelFutureListener.CLOSE)
-        ctx.writeAndFlush(Unpooled.copiedBuffer(invoke.toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE)
+        var simpleProtocol = SimpleProtocol(1024L, UUID.randomUUID().toString(), RpcInvokation(result = invoke))
+
+        ctx.writeAndFlush(Unpooled.copiedBuffer(SerializationUtils.serialize(simpleProtocol))).addListener(ChannelFutureListener.CLOSE)
     }
 }

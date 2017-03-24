@@ -16,6 +16,7 @@ import io.netty.channel.*
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.util.CharsetUtil
+import org.omg.CORBA.Object
 import org.springframework.util.SerializationUtils
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutput
@@ -30,8 +31,8 @@ import java.io.IOException
  * Created by xingke on 2017/3/22.
  */
 
-fun sendMsgToServer(message: SimpleProtocol): String {
-    var response = ""
+fun sendMsgToServer(message: SimpleProtocol): java.lang.Object {
+    var response: Any? = null
     val bootstrap = Bootstrap()
     val eventLoopGroup = NioEventLoopGroup()
 
@@ -47,9 +48,18 @@ fun sendMsgToServer(message: SimpleProtocol): String {
                         ch.pipeline().addLast(SimpleProtocolEncoder()) // 编码器
                         ch.pipeline().addLast(object : SimpleChannelInboundHandler<ByteBuf>() {
                             override fun channelRead0(ctx: ChannelHandlerContext?, msg: ByteBuf) {
-                                System.out.println("send success, response is: " + msg.toString(CharsetUtil.UTF_8))
-                                response = msg.toString(CharsetUtil.UTF_8)
-                                ctx!!.channel().closeFuture()
+//                                val version = msg.readLong() // 读取version
+//
+//                                val headerBytes = ByteArray(36)
+//                                msg.readBytes(headerBytes) // 读取header
+//
+//                                val header = String(headerBytes)
+
+                                val protocolBytes = ByteArray(msg.readableBytes())
+                                msg.readBytes(protocolBytes)
+
+                                var simpleProtocol = SerializationUtils.deserialize(protocolBytes) as SimpleProtocol
+                                response = simpleProtocol.rpcInvokation?.result
                             }
                         }) // 接收服务端数据
                     }
@@ -60,7 +70,7 @@ fun sendMsgToServer(message: SimpleProtocol): String {
 
         channelFuture.closeFuture().sync()
 
-        return response
+        return response as java.lang.Object
     } catch (e: Exception) {
         e.printStackTrace()
         throw RuntimeException("请求失败")

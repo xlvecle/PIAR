@@ -35,7 +35,7 @@ class SimpleServer {
                     .group(eventLoopGroup, childEventLoopGroup)
                     .channel(NioServerSocketChannel::class.java)
                     .childHandler(object : ChannelInitializer<Channel>() {
-                        override protected fun initChannel(ch: Channel) {
+                        override fun initChannel(ch: Channel) {
                             ch.pipeline().addLast(SimpleProtocolDecoder()) // 解码器
                             ch.pipeline().addLast(serverHandler) // 打印数据
                         }

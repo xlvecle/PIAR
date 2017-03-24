@@ -3,8 +3,10 @@ package com.piar.server
 
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONObject
+import com.piar.protocol.RpcInvokation
 import com.piar.protocol.SimpleProtocol
 import com.piar.protocol.SimpleProtocolDecoder
+import com.piar.protocol.SimpleProtocolEncoder
 import java.util.UUID
 import io.netty.channel.socket.nio.NioSocketChannel
 import com.sun.tools.internal.xjc.model.Multiplicity.group
@@ -14,14 +16,21 @@ import io.netty.channel.*
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.handler.codec.MessageToByteEncoder
 import io.netty.util.CharsetUtil
+import org.springframework.util.SerializationUtils
+import java.io.ByteArrayOutputStream
+import java.io.ObjectOutput
+import java.io.ObjectOutputStream
 import java.util.concurrent.TimeUnit
+import java.io.IOException
+
+
 
 
 /**
  * Created by xingke on 2017/3/22.
  */
 
-fun sendMsgToServer(formatedString: String): String {
+fun sendMsgToServer(message: SimpleProtocol): String {
     var response = ""
     val bootstrap = Bootstrap()
     val eventLoopGroup = NioEventLoopGroup()
@@ -35,24 +44,22 @@ fun sendMsgToServer(formatedString: String): String {
                 .handler(object : ChannelInitializer<Channel>() {
                     @Throws(Exception::class)
                     override fun initChannel(ch: Channel) {
-                        ch.pipeline().addLast(object : MessageToByteEncoder<SimpleProtocol>() {
-                            override fun encode(ctx: ChannelHandlerContext?, msg: SimpleProtocol, out: ByteBuf) {
-                                out.writeLong(msg.version)
-                                out.writeBytes(msg.header.toByteArray())
-                                out.writeBytes(msg.content.toByteArray())
-                            }
-                        }) // 编码器
+                        ch.pipeline().addLast(SimpleProtocolEncoder()) // 编码器
                         ch.pipeline().addLast(object : SimpleChannelInboundHandler<ByteBuf>() {
                             override fun channelRead0(ctx: ChannelHandlerContext?, msg: ByteBuf) {
-//                                System.out.println("send success, response is: " + msg.toString(CharsetUtil.UTF_8))
+                                println("hi")
+                                System.out.println("send success, response is: " + msg.toString(CharsetUtil.UTF_8))
                                 response = msg.toString(CharsetUtil.UTF_8)
+                                SimpleProtocolDecoder().isSingleDecode
+                                ctx!!.channel().write(msg)
                             }
                         }) // 接收服务端数据
+                        ch.pipeline().addLast(SimpleProtocolDecoder())
                     }
                 })
         val channelFuture = bootstrap.connect("localhost", 9999).sync().channel()
 
-        channelFuture.writeAndFlush(SimpleProtocol(1024L, UUID.randomUUID().toString(), formatedString))
+        channelFuture.writeAndFlush(message)
 
         channelFuture.closeFuture().sync()
 
@@ -69,9 +76,9 @@ fun sendMsgToServer(formatedString: String): String {
     }
 }
 
-fun methodSerialize(service: String, methodName: String, args: Array<Any>): String {
-    var args = JSON.toJSONString(args)
-    return "{\"service\": \"$service\", \"method\": \"$methodName\", \"args\": \"$args\"}"
+fun methodToSimpleProtocol(service: String, methodName: String, paramTypes: Array<Class<*>>, args: Array<Any>): SimpleProtocol {
+
+    return SimpleProtocol(1024L, UUID.randomUUID().toString(), RpcInvokation(service, methodName, paramTypes, args.map { it as java.lang.Object }.toTypedArray()))
 }
 
 fun deserializedString(input: String): JSONObject {
@@ -79,6 +86,17 @@ fun deserializedString(input: String): JSONObject {
     return parseObject
 }
 
+@Throws(IOException::class)
+private fun convertToBytes(`object`: Any): ByteArray {
+    ByteArrayOutputStream().use { bos ->
+        ObjectOutputStream(bos).use { out ->
+            out.writeObject(`object`)
+            return bos.toByteArray()
+        }
+    }
+}
+
+
 fun main(args: Array<String>) {
-    println(sendMsgToServer("xingke"))
+    println("1")
 }

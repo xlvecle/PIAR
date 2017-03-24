@@ -6,7 +6,7 @@ package com.piar.demo;
 public class TestRemoteServiceImpl implements TestLocalService {
 
     @Override
-    public int add(int a, int b) {
-        return a + b;
+    public Integer add(Integer a, Integer b, Integer c) {
+        return a + b + c;
     }
 }

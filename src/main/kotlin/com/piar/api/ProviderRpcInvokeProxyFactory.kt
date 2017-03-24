@@ -1,7 +1,6 @@
 package com.piar.api
 
 import com.piar.demo.TestRemoteServiceImpl
-import com.piar.server.methodSerialize
 import com.piar.server.sendMsgToServer
 import java.lang.reflect.Proxy
 

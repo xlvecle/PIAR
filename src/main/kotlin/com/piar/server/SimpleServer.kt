@@ -2,6 +2,7 @@ package com.piar.server
 
 import com.piar.protocol.ServerHandler
 import com.piar.protocol.SimpleProtocolDecoder
+import com.piar.protocol.SimpleProtocolEncoder
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBuf
 import io.netty.channel.Channel
@@ -37,6 +38,7 @@ class SimpleServer {
                         override protected fun initChannel(ch: Channel) {
                             ch.pipeline().addLast(SimpleProtocolDecoder()) // 解码器
                             ch.pipeline().addLast(serverHandler) // 打印数据
+                            ch.pipeline().addLast(SimpleProtocolEncoder())
                         }
                     })
 

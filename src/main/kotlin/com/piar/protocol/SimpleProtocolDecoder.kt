@@ -1,8 +1,10 @@
 package com.piar.protocol
 
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.EmptyByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.ByteToMessageDecoder
+import org.springframework.util.SerializationUtils
 
 /**
  * Created by xingke on 2017/3/22.
@@ -18,11 +20,16 @@ class SimpleProtocolDecoder: ByteToMessageDecoder() {
 
             val header = String(headerBytes)
 
-            val contentBytes = ByteArray(input.readableBytes()) // 读取content
-            input.readBytes(contentBytes)
+            val rpcInvocationBytes = ByteArray(input.readableBytes())
+            input.readBytes(rpcInvocationBytes)
 
-            out.add(SimpleProtocol(version, header, String(contentBytes)))
+            var rpcInvocation = SerializationUtils.deserialize(rpcInvocationBytes) as RpcInvokation
+            out.add(SimpleProtocol(version, header, rpcInvocation)
+            )
         } catch (e: Exception) {
+            if (input !is EmptyByteBuf) {
+                e.printStackTrace()
+            }
         }
 
     }

@@ -3,6 +3,7 @@ package com.piar.protocol
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.TypeReference
 import com.piar.server.deserializedString
+import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelFutureListener
 import io.netty.util.CharsetUtil
 import io.netty.buffer.Unpooled
@@ -12,6 +13,7 @@ import io.netty.channel.SimpleChannelInboundHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.context.ApplicationContext
+import org.springframework.util.SerializationUtils
 import java.io.ObjectInputStream
 
 
@@ -28,22 +30,24 @@ class ServerHandler : SimpleChannelInboundHandler<SimpleProtocol>() {
     @Throws(Exception::class)
     override fun channelRead0(ctx: ChannelHandlerContext, msg: SimpleProtocol) {
         println("server receive: " + msg)
-        var jobj = deserializedString(msg.content)
-        var serviceName = jobj.getString("service")
-        var methodName = jobj.getString("method")
-        var args = jobj.getJSONArray("args")
+
+        var serviceName = msg.rpcInvokation!!.service
+        var methodName = msg.rpcInvokation!!.methodName
+        var parameterTypes = msg.rpcInvokation!!.parameterTypes
+        var args = msg.rpcInvokation!!.args
 
         var bean = appContext.getBean(appContext.getBeanNamesForType(Class.forName(serviceName))[0])
-        var method = bean::class.java.declaredMethods.filter { it.name == methodName }[0]
 
-        var realArgs = args.zip(method.parameterTypes).map {
-            it.first as Int
-        }.toTypedArray()
+        var method = bean::class.java.getMethod(methodName, *parameterTypes)
 
-
-        var invoke = method.invoke(realArgs)
+        var invoke = method.invoke(bean, *args)
         println("服务为: $serviceName")
-        println("参数为: $jobj['args']")
-        ctx.writeAndFlush(Unpooled.copiedBuffer("100", CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE)
+
+        msg.rpcInvokation!!.result = invoke as java.lang.Object
+
+
+        ctx.channel().write(msg)
+//        ctx.writeAndFlush(invoke).addListener(ChannelFutureListener.CLOSE)
+//        ctx.writeAndFlush(Unpooled.copiedBuffer(invoke.toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE)
     }
 }

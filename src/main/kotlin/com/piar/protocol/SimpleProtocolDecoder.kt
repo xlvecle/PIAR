@@ -24,8 +24,7 @@ class SimpleProtocolDecoder: ByteToMessageDecoder() {
             input.readBytes(rpcInvocationBytes)
 
             var rpcInvocation = SerializationUtils.deserialize(rpcInvocationBytes) as RpcInvokation
-            out.add(SimpleProtocol(version, header, rpcInvocation)
-            )
+            out.add(SimpleProtocol(version, header, rpcInvocation))
         } catch (e: Exception) {
             if (input !is EmptyByteBuf) {
                 e.printStackTrace()

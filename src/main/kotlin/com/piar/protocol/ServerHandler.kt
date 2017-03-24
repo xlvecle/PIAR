@@ -46,8 +46,8 @@ class ServerHandler : SimpleChannelInboundHandler<SimpleProtocol>() {
         msg.rpcInvokation!!.result = invoke as java.lang.Object
 
 
-        ctx.channel().write(msg)
+//        ctx.channel().write(msg)
 //        ctx.writeAndFlush(invoke).addListener(ChannelFutureListener.CLOSE)
-//        ctx.writeAndFlush(Unpooled.copiedBuffer(invoke.toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE)
+        ctx.writeAndFlush(Unpooled.copiedBuffer(invoke.toString(), CharsetUtil.UTF_8)).addListener(ChannelFutureListener.CLOSE)
     }
 }

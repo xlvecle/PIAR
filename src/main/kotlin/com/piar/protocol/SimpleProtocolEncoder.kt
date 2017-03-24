@@ -17,7 +17,6 @@ class SimpleProtocolEncoder: MessageToByteEncoder<SimpleProtocol>() {
         out.writeBytes(msg.header.toByteArray())
         var serialize = SerializationUtils.serialize(msg.rpcInvokation)
         out.writeBytes(serialize)
-        ctx!!.channel().writeAndFlush(out).addListener(ChannelFutureListener.CLOSE)
     }
 
 }

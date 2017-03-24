@@ -47,14 +47,11 @@ fun sendMsgToServer(message: SimpleProtocol): String {
                         ch.pipeline().addLast(SimpleProtocolEncoder()) // 编码器
                         ch.pipeline().addLast(object : SimpleChannelInboundHandler<ByteBuf>() {
                             override fun channelRead0(ctx: ChannelHandlerContext?, msg: ByteBuf) {
-                                println("hi")
                                 System.out.println("send success, response is: " + msg.toString(CharsetUtil.UTF_8))
                                 response = msg.toString(CharsetUtil.UTF_8)
-                                SimpleProtocolDecoder().isSingleDecode
-                                ctx!!.channel().write(msg)
+                                ctx!!.channel().closeFuture()
                             }
                         }) // 接收服务端数据
-                        ch.pipeline().addLast(SimpleProtocolDecoder())
                     }
                 })
         val channelFuture = bootstrap.connect("localhost", 9999).sync().channel()
@@ -69,7 +66,7 @@ fun sendMsgToServer(message: SimpleProtocol): String {
         throw RuntimeException("请求失败")
     } finally {
         try {
-            eventLoopGroup.shutdownGracefully(1, 1, TimeUnit.MILLISECONDS).sync()
+            eventLoopGroup.shutdownGracefully(1, 1, TimeUnit.SECONDS).sync()
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }

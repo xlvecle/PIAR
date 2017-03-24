@@ -48,12 +48,6 @@ fun sendMsgToServer(message: SimpleProtocol): java.lang.Object {
                         ch.pipeline().addLast(SimpleProtocolEncoder()) // 编码器
                         ch.pipeline().addLast(object : SimpleChannelInboundHandler<ByteBuf>() {
                             override fun channelRead0(ctx: ChannelHandlerContext?, msg: ByteBuf) {
-//                                val version = msg.readLong() // 读取version
-//
-//                                val headerBytes = ByteArray(36)
-//                                msg.readBytes(headerBytes) // 读取header
-//
-//                                val header = String(headerBytes)
 
                                 val protocolBytes = ByteArray(msg.readableBytes())
                                 msg.readBytes(protocolBytes)

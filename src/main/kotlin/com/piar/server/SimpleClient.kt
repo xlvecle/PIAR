@@ -1,6 +1,8 @@
 
-package com.piar.test
+package com.piar.server
 
+import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.JSONObject
 import com.piar.protocol.SimpleProtocol
 import com.piar.protocol.SimpleProtocolDecoder
 import java.util.UUID
@@ -65,6 +67,16 @@ fun sendMsgToServer(formatedString: String): String {
             e.printStackTrace()
         }
     }
+}
+
+fun methodSerialize(service: String, methodName: String, args: Array<Any>): String {
+    var args = JSON.toJSONString(args)
+    return "{\"service\": \"$service\", \"method\": \"$methodName\", \"args\": \"$args\"}"
+}
+
+fun deserializedString(input: String): JSONObject {
+    var parseObject = JSON.parseObject(input)
+    return parseObject
 }
 
 fun main(args: Array<String>) {

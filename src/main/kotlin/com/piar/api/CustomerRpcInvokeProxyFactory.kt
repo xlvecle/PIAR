@@ -1,5 +1,7 @@
 package com.piar.api
 
+import com.piar.server.methodSerialize
+import com.piar.server.sendMsgToServer
 import java.lang.reflect.Proxy
 
 /**
@@ -12,10 +14,15 @@ class CustomerRpcInvokeProxyFactory {
         fun <T> getProxy(clazz: Class<T>): T {
             return clazz.cast(
                     Proxy.newProxyInstance( ClassLoader.getSystemClassLoader(), arrayOf(clazz)) {
-                        proxy, method, args -> println("你正在被代理,这里将要被替换成调用远程的RPC方法 args: " + args?.joinToString(","))
-                        val ret = args[0] as Int + args[1] as Int
-                        println("result: $ret")
-                        ret
+                        proxy, method, args -> println("你正在被代理,去请求远程 args: " + args?.joinToString(","))
+                        println(clazz.name)
+                        val response = sendMsgToServer(methodSerialize(clazz.name, method.name, args))
+                        println("server_response: $response")
+                        if (method.returnType.name == "int") {
+                            Integer.parseInt(response)
+                        } else {
+                            method.returnType.cast(response)
+                        }
                     })
         }
     }

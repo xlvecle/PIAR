@@ -54,6 +54,7 @@ fun sendMsgToServer(message: SimpleProtocol): java.lang.Object {
 
                                 var simpleProtocol = SerializationUtils.deserialize(protocolBytes) as SimpleProtocol
                                 response = simpleProtocol.rpcInvokation?.result
+                                println("server_response: $response")
                             }
                         }) // 接收服务端数据
                     }

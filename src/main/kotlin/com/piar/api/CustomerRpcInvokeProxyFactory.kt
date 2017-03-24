@@ -18,7 +18,6 @@ class CustomerRpcInvokeProxyFactory {
                         println(clazz.name)
                         var simpleProtocol = methodToSimpleProtocol(clazz.name, method.name, method.parameterTypes, args)
                         val response = sendMsgToServer(simpleProtocol)
-                        println("server_response: $response")
                         response
                     })
         }
